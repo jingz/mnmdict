@@ -1,0 +1,100 @@
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>view</title>
+  <style type="text/css" media="screen">
+    body{
+      font-family: Hevetica, "Bookman Old Style", Consolas;
+      width: 360px;
+    }
+    
+    .bold-border-bottom{
+      border-bottom: 2px solid black;
+    }
+    
+    #param{
+      padding: 5px;
+      font-weight: bold;
+      font-size: 1.33em;
+      color: #333;
+      width: 63%;
+    }
+    
+    #content{
+      /*border-top: 2px solid #aaa;*/
+      margin-top: 0.3em;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0.3em;
+    }
+    
+    hr{
+      width: 98%;
+      color: #bbb;
+      border-style: dashed;
+    }
+    
+    #no_mean{
+      color: red;
+    }
+    
+  </style>
+  <script src="jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="dict_action.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    // Longdo dictionary API
+    
+    // render
+    function renderer (meanings,word_filter) {
+      // hardcode to filter output from longdo html return format
+      // extract only value that match the word filter from the result
+      // render to content
+      if(meanings.length > 0) $("#content").html(meanings.join('<hr/>'))
+      else $("#content").html(no_meaning_template)
+      
+      // init event for newly append a elements
+      $("#content").find("a").each(function  () {
+        $(this).click(function  () {
+          w = $(this).text();
+          $("#param").val(w)
+          longdo_lookup(w,renderer,render_waiting)
+        });
+      });
+    }
+    
+    // beforeSend
+    function render_waiting () {
+      $("#content").html("Searching ...")
+    }
+    
+    // document loaded
+    $(document).ready(function  () {
+      // add handler for input
+      $("#param").keydown(function  (e) {
+        // if user press enter then do seach
+        if(e.keyCode == 13){
+          var word = $(this).val()
+          longdo_lookup($.trim(word),renderer,render_waiting)
+          $(this).blur();
+        }
+      });
+      
+      // set focus to input
+      $("#param").focus();
+    })
+    
+    chrome.extension.onRequest.addListener(function  (r,s,c) {
+      console.log("testset")
+    })
+  </script>
+</head>
+<body>
+  <div id="head">
+    <div><input title="enter for seaching" type="text" name="p" value="" id="param"></div>
+  </div>
+  <div id="content">
+  </div>
+  <div id="footer">
+  </div>
+</body>
+</html>
