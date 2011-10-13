@@ -51,7 +51,10 @@
       // render to content
       if(meanings.length > 0) $("#content").html(meanings.join('<hr/>'))
       else $("#content").html(no_meaning_template)
-      
+      // inform that the returned meanings result from the nearest word
+      old_val = $("#param").val()
+      if(old_val != word_filter) $("#param").val(word_filter).css({color:"red"})
+		      
       // init event for newly append a elements
       $("#content").find("a").each(function  () {
         $(this).click(function  () {
@@ -71,6 +74,8 @@
     $(document).ready(function  () {
       // add handler for input
       $("#param").keydown(function  (e) {
+	// reset to normal color
+	$(this).css({color:"#333"})
         // if user press enter then do seach
         if(e.keyCode == 13){
           var word = $(this).val()
@@ -83,7 +88,7 @@
       $("#param").focus();
     })
     
-    chrome.extension.onRequest.addListener(function  (r,s,c) {
+      chrome.extension.onRequest.addListener(function  (r,s,c) {
       console.log("testset")
     })
   </script>
