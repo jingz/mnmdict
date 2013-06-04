@@ -1,16 +1,24 @@
 {
   "name": "Minimal EN-TH-EN Dictionary",
-  "version": "1.3",
+  "manifest_version": 2,
+  "version": "1.3.1",
   "description": "A Minimal Dictionary Powered by Longdo.",
   "content_scripts":[
     {
       "matches": ["*://*/*","file:///*/*"],
-      "js": ["jquery-1.3.2.min.js","jquery.bt.min.js","dict_action.js","myscript.js"]  
+      "js": [
+          "jquery-1.3.2.min.js",
+          "jquery.bt.min.js",
+          "dict_action.js",
+          "myscript.js", 
+          "init.js", 
+          "style.css"
+      ]
     }
   ],
   "browser_action": {
     "default_icon": "dict.png",
-    "popup": "view.html"
+    "default_popup": "view.html"
   },
   "permissions": [
     "http://dict.longdo.com/*",

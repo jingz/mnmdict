@@ -13,7 +13,6 @@ function renderer(meanings, soundlist, word_filter) {
     if(old_val != word_filter) $("#param").val(word_filter).css({color:"red"})
             
     // init event for newly-appended a elements
-    console.log(soundlist);
 
     $("#content").find("a").each(function() {
         var href = $(this).attr("href");
