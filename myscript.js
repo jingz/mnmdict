@@ -18,25 +18,27 @@
 	    positions: ['top'],
 	    // style
 	    padding: 10,
+		  margin: 0,
 	    spikeLength: 10,
 	    spikeGirth: 20,
 	    cornerRadius: 20,
 	    fill: 'rgba(255, 255, 0, .9)',
 	    strokeWidth: 2,
 	    strokeStyle: '#000',
-	    cssStyles: {color: '#000',
-			zIndex: 99999,
-			fontSize: "14px",
-			fontFamily: "Bookman Old Style",
-			textAlign:"left"},
+	    cssStyles: {
+				color: '#000',
+				zIndex: 9999,
+				fontSize: "14px",
+				fontFamily: "Bookman Old Style",
+			  textAlign: "left"
+			},
 	    postShow: function(box){
 	      // disable link
 	      $(box).find("a")
-		    .css({color: "black"})
-		    .click(function  () {
-			return false;
-		    })
-	      
+					.css({color: "black"})
+					.click(function  () {
+						return false;
+					})
 	      // callback
 	      if(after_posted) after_posted(box);
 	    }
@@ -64,7 +66,7 @@
     // show message
     this.show = function  (m) {
       pin_up(m,function(box){
-	  $(box).find("#more_meaning").click(self.show_more)
+				$(box).find("#more_meaning").click(self.show_more)
       })
     }
     
@@ -82,9 +84,8 @@
   
   // Main 
   // init UI
-  var dummyUI = '<div id="bt_dummy"></div>';
+  var dummyUI = '<div id="bt_dummy" style="position:absolute;"></div>';
   $("body").append($(dummyUI))
-  $("#bt_dummy").css({ position: "absolute"})
 
   // double click on text
   $(document).dblclick(function  (e) {
@@ -101,7 +102,6 @@
     // call API
     longdo_lookup(word,
 		  function  (meanings) { new PinManager(meanings) },
-		  pin_searching);
+		  pin_searching
+		);
   });
-    
-  // TODO hilight on text
