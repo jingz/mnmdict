@@ -10,7 +10,7 @@ function renderer(meanings, soundlist, word_filter) {
     else $("#content").html(no_meaning_template);
     // inform that the returned meanings result from the nearest word
     var old_val = $("#param").val();
-    if(old_val != word_filter) $("#param").val(word_filter).css({color:"red"})
+    if(old_val != word_filter) $("#param").val(word_filter);//.css({color:"red"})
             
     // init event for newly-appended a elements
 
@@ -45,23 +45,24 @@ function render_waiting () {
     $("#soundlist").html("");
 }
 
+init_db();
+
 // document loaded
 $(document).ready(function  () {
     // add handler for input
+
     $("#param").keydown(function  (e) {
         // reset to normal color
         $(this).css({color:"#333"})
         // if user press enter then do seach
         if(e.keyCode == 13){
           var word = $(this).val();
-          longdo_lookup($.trim(word), renderer, render_waiting);
+          longdo_lookup($.trim(word), renderer, render_waiting, null, true);
           // $(this).blur();
         }
     });
-    //
+
     // set focus to input
     $("#param").focus();
 });
-
-// chrome.extension.onRequest.addListener(function  (r,s,c) { });
 

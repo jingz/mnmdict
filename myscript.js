@@ -64,7 +64,7 @@ var PinManager = function(meanings, soundlist) {
     // get more link method
     this.get_more_link = function  () {
         var remain = this.n_words - this.index - 1;
-        return "<span style='diplay:block;float:right;'><a id='more_meaning' href='#'><b>&rarr; ("+remain+")</b></a></span>";
+        return "<span style='diplay:block; float:right;'><a id='more_meaning' href='#'><b>&rarr; ("+remain+")</b></a></span>";
     }
 
     // show message
@@ -92,7 +92,7 @@ var PinManager = function(meanings, soundlist) {
         return false;
     }
 
-    // init
+    // init content in balloon
     var c = "<div>" +
             this.soundlistTpl + 
             this.meanings[this.index] + 
@@ -104,7 +104,7 @@ var PinManager = function(meanings, soundlist) {
 
 // Main --------------------------------------------------------------
 // init UI
-var dummyUI = '<div id="bt_dummy" style="position:absolute;"></div>';
+var dummyUI = '<div id="bt_dummy" style="position: absolute;"></div>';
 $("body").append($(dummyUI));
 
 // UI for play voice
@@ -118,11 +118,28 @@ $(document).dblclick(function  (e) {
     var word = $.trim(sNode.toString());
     // avoid empty text
     if(word == "" ) return false;
+    var orig = e.originalEvent;
     $("#bt_dummy").css({
-      top: e.pageY - 15,
-      left: e.pageX
+      top: orig.pageY - 15,
+      left: orig.pageX
     });
 
     // call API
-    longdo_lookup(word, function(meanings, soundlist){ new PinManager(meanings, soundlist) }, pin_searching);
+    longdo_lookup(word, function(meanings, soundlist){ 
+        // log_word_history(word, meanings, soundlist);
+
+        // sending message to popup
+        chrome.runtime.sendMessage(
+            null, 
+            { word: word, meanings: meanings, soundlist: soundlist },
+            function(res) {
+                console.log("loging history ok", res);
+            }
+        );
+
+        new PinManager(meanings, soundlist) 
+    }, pin_searching);
+
+
 });
+
