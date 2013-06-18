@@ -45,11 +45,10 @@ function render_waiting () {
     $("#soundlist").html("");
 }
 
-init_db();
-
 // document loaded
 $(document).ready(function  () {
     // add handler for input
+    window.init_db();
 
     $("#param").keydown(function  (e) {
         // reset to normal color

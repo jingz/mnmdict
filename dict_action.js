@@ -8,12 +8,10 @@ $.expr[':'].text_match = function  (obj, index, meta, stack) {
   // argument of selector
   var regexp = meta[meta.length-1];
   var r = new RegExp("^"+regexp+"$", "i");
-  // eval("var r = " + regexp);
   return r.test(text);
 }
 
 function log_word_history_from_background(req, sender, sendResponse) {
-    console.log(arguments)
     window.log_word_history(req.word, req.meanings, req.soundlist);
     sendResponse({ result: "ok"});
 }
@@ -36,8 +34,6 @@ function log_word_history(word, meanings, soundlist) {
         if(/^\(/.test(m)) candidate_meanings.push($.trim(m.split(")")[1]));
     }
 
-    console.log(candidate_meanings)
-
     if(candidate_meanings.length == 0) return false;
     // voice
     var sound_uk, sound_us;
@@ -54,40 +50,46 @@ function log_word_history(word, meanings, soundlist) {
         }
     }
     var params = [word, candidate_meanings, sound_us, sound_uk, new Date(), JSON.stringify(meanings)]
-    try {
-        window.db.execute("INSERT INTO wordlist(word, meaning, sound_us, sound_uk, created_at, full_meaning) VALUES (?,?,?,?,?,?);", params);
-    } catch(e){
-        console.log(e);
-    }
+
+    var w = new Wordlist({
+            word: word.toLowerCase(),
+            meaning: candidate_meanings,
+            sound_us: sound_us,
+            sound_uk: sound_uk,
+            created_at: new Date(),
+            full_meaning: JSON.stringify(meanings)
+        }, function() {
+        this.save();
+    });
 }
 
 function longdo_lookup(word, cb, bf, last_char, do_log) {
-  var callee = arguments.callee;
-  do_log = do_log || false;
-  // search in history first
-  var found = false;
-
-  var r;
-  if(window.db){
-      window.db.execute("select * from wordlist where word like ? limit 1", [word], function  (recs) {
-         r = recs[0];
-         if(r){
-             found = true;
-             cb(JSON.parse(r.full_meaning), [], r.word);
-         }
-      });
-  }
-
-  setTimeout(function() {
-      if(found) return;
-
-      $.ajax({
-        url: api + word,
-        beforeSend: bf || function(){},
-        error: function  () {
+    var callee = arguments.callee;
+    do_log = do_log || false;
+    // search in history first
+    // var found = false;
+    // var r;
+    // Wordlist.find_by_sql("select * from wordlist where word like ? limit 1", 
+    //                      [word], 
+    //                      function(rs) {
+    //    r = rs[0];
+    //    if(r){
+    //        found = true;
+    //        var attrs = r.attributes;
+    //        var soundlist = [];
+    //        if(attrs.sound_us) soundlist.push({ type: "us", src: attrs.sound_us });
+    //        if(attrs.sound_uk) soundlist.push({ type: "uk", src: attrs.sound_uk });
+    //        cb( JSON.parse(attrs.full_meaning), soundlist, attrs.word);
+    //    }
+    // });
+  
+    $.ajax({
+      url: api + word,
+      beforeSend: bf || function(){},
+      error: function  () {
           cb({},"error");
-        },
-        success: function  (raw_html) {
+      },
+      success: function  (raw_html) {
           var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
           var meanings = [];
           var soundlist = []; // { type: 'uk', src: '...' }
@@ -159,9 +161,7 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
           // send array of meaning to callback
           // cb(meanings ,word)
         }
-      });
-  }, 200);
-  
+    });
 }
 
 chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
