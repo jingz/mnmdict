@@ -32,6 +32,7 @@
     },
     "permissions": [
         "http://dict.longdo.com/*",
+        "http://search.longdo.com/*",
         "http://ajax.aspnetcdn.com/*",
         "http://dictionary.cambridge.org/*"
     ]

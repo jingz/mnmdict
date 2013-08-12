@@ -168,3 +168,26 @@ chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
     window.log_word_history_from_background(r, sender, sendResponse);
 });
 
+// adding listener for external message
+chrome.runtime.onMessageExternal.addListener(
+    function(req, res, sendResponse) {
+        // sending array of
+        // { 
+        //   meaning:
+        //   word:
+        // }
+        var data = [];
+
+        Wordlist.all(function(rs) {
+            for(var i = 0; i < rs.length; i++){
+                data.push({ meaning: rs[i].meaning, word: rs[i].word});
+            }
+            sendResponse({ result: data });
+        });
+
+        // in order to able to send response
+        // after this listener timeout
+        return true;
+    }
+);
+

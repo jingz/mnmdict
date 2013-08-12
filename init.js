@@ -13,16 +13,7 @@ function renderer(meanings, soundlist, word_filter) {
     if(old_val != word_filter) $("#param").val(word_filter);//.css({color:"red"})
             
     // init event for newly-appended a elements
-
-    $("#content").find("a").each(function() {
-        var href = $(this).attr("href");
-        // filter sound link
-        $(this).click(function() {
-          var w = $(this).text();
-          $("#param").val(w);
-          longdo_lookup(w, renderer, render_waiting);
-        });
-    });
+    init_link_action();
 
     for(var i in soundlist){
         var s = soundlist[i];
@@ -39,6 +30,19 @@ function renderer(meanings, soundlist, word_filter) {
 
 }
 
+function init_link_action() {
+    $("#content").find("a").each(function() {
+        var href = $(this).attr("href");
+        // filter sound link
+        $(this).click(function() {
+          var w = $(this).text();
+          $("#param").val(w);
+          longdo_lookup(w, renderer, render_waiting);
+        });
+    });
+
+}
+
 // beforeSend
 function render_waiting () {
     $("#content").html("Searching ...");
@@ -50,14 +54,35 @@ $(document).ready(function  () {
     // add handler for input
     window.init_db();
 
-    $("#param").keydown(function  (e) {
+    // Autocomplete callback
+    function processJSONSuggest(sresult, cnt) {
+        // sresult = [{ "w": ... , "d": .... , "s": ... , "id": ... }]
+        var data = [];
+        for(i = 0; i < sresult.length; i++){
+            data.push("<a href='#'>" + sresult[i].w + '</a>');
+        }
+        console.log(data);
+        $("#content").html( data.join("<br/>") );
+        init_link_action();
+    }
+
+    $("#param").keyup(function  (e) {
         // reset to normal color
         $(this).css({color:"#333"})
         // if user press enter then do seach
+        var word = $(this).val();
         if(e.keyCode == 13){
-          var word = $(this).val();
           longdo_lookup($.trim(word), renderer, render_waiting, null, true);
-          // $(this).blur();
+        } else if(word.length >= 3){
+            // autocomplete
+            // source : http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=rigor
+            $.ajax({
+                url: "http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=" + word,
+                success: function(res) {
+                    // it will call processJSONSuggest
+                    eval(res);
+                }
+            });
         }
     });
 
