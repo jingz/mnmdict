@@ -49,15 +49,11 @@ function log_word_history(word, meanings, soundlist) {
             } 
         }
     }
-    var params = [word, candidate_meanings, sound_us, sound_uk, new Date(), JSON.stringify(meanings)]
 
     var w = new Wordlist({
             word: word.toLowerCase(),
             meaning: candidate_meanings,
-            sound_us: sound_us,
-            sound_uk: sound_uk,
-            created_at: new Date(),
-            full_meaning: JSON.stringify(meanings)
+            created_at: new Date()
         }, function() {
         this.save();
     });
@@ -66,23 +62,7 @@ function log_word_history(word, meanings, soundlist) {
 function longdo_lookup(word, cb, bf, last_char, do_log) {
     var callee = arguments.callee;
     do_log = do_log || false;
-    // search in history first
-    // var found = false;
-    // var r;
-    // Wordlist.find_by_sql("select * from wordlist where word like ? limit 1", 
-    //                      [word], 
-    //                      function(rs) {
-    //    r = rs[0];
-    //    if(r){
-    //        found = true;
-    //        var attrs = r.attributes;
-    //        var soundlist = [];
-    //        if(attrs.sound_us) soundlist.push({ type: "us", src: attrs.sound_us });
-    //        if(attrs.sound_uk) soundlist.push({ type: "uk", src: attrs.sound_uk });
-    //        cb( JSON.parse(attrs.full_meaning), soundlist, attrs.word);
-    //    }
-    // });
-  
+
     $.ajax({
       url: api + word,
       beforeSend: bf || function(){},

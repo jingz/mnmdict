@@ -3,7 +3,7 @@
         WEB_DB_CONFIG: {
             database: 'mnmdict',
             table: 'mnmdict',
-            size: 10*1024*1024,
+            size: 100*1024*1024,
             version: "1.0"
         } 
     }

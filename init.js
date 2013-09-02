@@ -61,11 +61,11 @@ $(document).ready(function  () {
         for(i = 0; i < sresult.length; i++){
             data.push("<a href='#'>" + sresult[i].w + '</a>');
         }
-        console.log(data);
         $("#content").html( data.join("<br/>") );
         init_link_action();
     }
 
+    // autocomplete
     $("#param").keyup(function  (e) {
         // reset to normal color
         $(this).css({color:"#333"})
@@ -74,7 +74,6 @@ $(document).ready(function  () {
         if(e.keyCode == 13){
           longdo_lookup($.trim(word), renderer, render_waiting, null, true);
         } else if(word.length >= 3){
-            // autocomplete
             // source : http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=rigor
             $.ajax({
                 url: "http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=" + word,

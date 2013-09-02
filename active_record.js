@@ -122,6 +122,7 @@ AR = (function () {
     AR.prototype.save = function(cb){
         var self = this;
         var attrs = this.attributes;
+        cb = cb || function(){};
         if(attrs.id){
             // update
             var sql = [], params = [];
