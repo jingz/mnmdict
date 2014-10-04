@@ -1,7 +1,7 @@
 {
     "name": "Minimal EN-TH-EN Dictionary",
     "manifest_version": 2,
-    "version": "1.4",
+    "version": "1.5.1",
     "description": "A Minimal Dictionary Powered by Longdo.",
     "background": {
         "page": "view.html",
