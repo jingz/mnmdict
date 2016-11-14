@@ -1,4 +1,4 @@
-var api = "http://dict.longdo.com/mobile.php?search="
+var api = window.location.protocol + "//dict.longdo.com/mobile.php?search="
 var cambrigde_api = "http://dictionary.cambridge.org/search/british/?utm_source=widget_searchbox_source&utm_medium=widget_searchbox&utm_campaign=widget_tracking";
 var no_meaning_template = "<b id='no_mean'>Not found !</b>"
 
