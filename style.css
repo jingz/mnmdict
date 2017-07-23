@@ -1,8 +1,7 @@
-
 body {
-    font-family: "Bookman Old Style", Consolas;
-    font-size: 16px;
-    width: 360px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 18px;
+    width: 550px;
 }
 
 #soundframe {
@@ -30,7 +29,6 @@ body {
 
 #param {
     padding: 5px;
-    font-weight: bold;
     font-size: 1.33em;
     color: #333;
     width: 60%;
@@ -54,3 +52,11 @@ hr {
     color: red;
 }
 
+/* auto complete */
+.possible-list {
+    padding: 0px;
+    padding-left: 1.5rem;
+}
+.possible-items {
+    margin: 0.3rem;
+}

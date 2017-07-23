@@ -40,7 +40,6 @@ function init_link_action() {
           longdo_lookup(w, renderer, render_waiting);
         });
     });
-
 }
 
 // beforeSend
@@ -57,11 +56,14 @@ $(document).ready(function  () {
     // Autocomplete callback
     function processJSONSuggest(sresult, cnt) {
         // sresult = [{ "w": ... , "d": .... , "s": ... , "id": ... }]
-        var data = [];
+        let data = [];
         for(i = 0; i < sresult.length; i++){
-            data.push("<a href='#'>" + sresult[i].w + '</a>');
+            console.log(sresult[i])
+            if (sresult[i].w) {
+                data.push("<li class='possible-items'><a href='#'>" + sresult[i].d + '</a></li>');
+            }
         }
-        $("#content").html( data.join("<br/>") );
+        $("#content").html("<ol class='possible-list'>" + data.join("") + "</ol>");
         init_link_action();
     }
 

@@ -55,6 +55,7 @@ function log_word_history(word, meanings, soundlist) {
         }
     }
 
+    // save looked up word into history
     var w = new Wordlist({
         word: word.toLowerCase(),
         meaning: candidate_meanings,
