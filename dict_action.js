@@ -8,7 +8,7 @@ var cambrigde_api = "http://dictionary.cambridge.org/search/british/?utm_source=
 var no_meaning_template = "<b id='no_mean'>Not found !</b>"
 
 // custom selector
-$.expr[':'].text_match = function  (obj, index, meta, stack) {
+$.expr[':'].text_match = function (obj, index, meta, stack) {
     var text = $(obj).text();
     // argument of selector
     var regexp = meta[meta.length-1];

@@ -14,22 +14,22 @@ function pin_up (m, after_posted) {
     // setup balloon
     balloon.bt(m, {
         trigger: 'none',
-        width: 200,
+        width: 250,
         positions: ['top'],
         // style
         padding: 10,
         margin: 0,
         spikeLength: 10,
         spikeGirth: 20,
-        cornerRadius: 20,
+        cornerRadius: 10,
         fill: 'rgba(255, 255, 0, .9)',
-        strokeWidth: 2,
+        strokeWidth: 1,
         strokeStyle: '#000',
         cssStyles: {
             color: '#000',
             zIndex: 9999,
-            fontSize: "14px",
-            fontFamily: "Bookman Old Style",
+            fontSize: "16px",
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";',
             textAlign: "left"
         },
         postShow: function(box){
@@ -64,16 +64,16 @@ var PinManager = function(meanings, soundlist) {
     // get more link method
     this.get_more_link = function  () {
         var remain = this.n_words - this.index - 1;
-        return "<span style='diplay:block; float:right;'><a id='more_meaning' href='#'><b>&rarr; ("+remain+")</b></a></span>";
+        return "<span style='diplay:block; float:right;'><a id='more_meaning' href='#'><b style='color: blue;'>&rarr; ("+remain+")</b></a></span>";
     }
 
     // show message
     this.show = function(m) {
-        pin_up(m, function(box){ 
+        pin_up(m, function(box){
             $(box).find("#more_meaning").click(self.show_more);
 
             // init trigger for playing voice
-            $(box).find(".soundcheck").click(function  () {
+            $(box).find(".soundcheck").click(function () {
                 var href = $(this).attr("href");
                 $("#sound_dummy").attr("src", href);
                 return false;
@@ -104,7 +104,7 @@ var PinManager = function(meanings, soundlist) {
 
 // Main --------------------------------------------------------------
 // init UI
-var dummyUI = '<div id="bt_dummy" style="position: absolute;"></div>';
+var dummyUI = '<div id="bt_dummy" style="position: absolute; text-align: left;"></div>';
 $("body").append($(dummyUI));
 
 // UI for play voice
@@ -112,7 +112,7 @@ var dummySound = '<iframe src="" id="sound_dummy" style="display:none;"></iframe
 $("body").append($(dummySound));
 
 // double click on text
-$(document).dblclick(function  (e) {
+$(document).dblclick(function (e) {
     // get seleted word from content
     var sNode = window.getSelection();
     var word = $.trim(sNode.toString());
@@ -137,9 +137,6 @@ $(document).dblclick(function  (e) {
             }
         );
 
-        new PinManager(meanings, soundlist) 
+        new PinManager(meanings, soundlist)
     }, pin_searching);
-
-
 });
-
