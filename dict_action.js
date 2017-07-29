@@ -23,25 +23,24 @@ function log_word_history_from_background(req, sender, sendResponse) {
 
 // loggin word
 function log_word_history(word, meanings, soundlist) {
-    // gether first 3 meanings
-    if(!/[A-Za-z]+/g.test(word)){
-        console.info("not logging this word");
-    }
-    candidate_meanings = [];
-    var i, m;
-    for(i = 0; i < meanings.length && i < 3; i++){
-        // incase voice tag prepared ex <a href='voice.mp3'></a>
-        m = $('<div>' + meanings[i] + '</div>').text().trim(); 
-        // expect meaning format like this
-        // possible meaning format
-        // [N] การทดสอบ, See also: การตรวจสอบ, Syn. trial, tryout
-        if(/^\[/.test(m)) candidate_meanings.push($.trim(m.split(",")[0]));
-        // (ไลคฺ'ลิฮูด) n. ความเป็นไปได้,ความน่าจะเป็นไปได้, <b>Syn.</b> possibility
-        if(/^\(/.test(m)) candidate_meanings.push($.trim(m.split(")")[1]));
-    }
+    // gether first 3 exactly matched meanings
+    candidate_meanings = meanings.filter(m => m.exact)
+    // candidate_meanings.splice(0, 3)
+    if(candidate_meanings.length === 0) return false;
 
-    if(candidate_meanings.length == 0) return false;
+    let log_meanings = candidate_meanings.map(c => $(`<div>${c.desc}</div>`).text().trim() )
+    console.log(log_meanings)
+    // save looked up word into history
+    var w = new Wordlist({
+        word: word.toLowerCase(),
+        meaning: log_meanings,
+        created_at: new Date()
+    }, function() {
+        this.save();
+    });
+
     // voice
+    /*
     var sound_uk, sound_us;
     if(soundlist.length > 0){
         var sound;
@@ -55,15 +54,7 @@ function log_word_history(word, meanings, soundlist) {
             } 
         }
     }
-
-    // save looked up word into history
-    var w = new Wordlist({
-        word: word.toLowerCase(),
-        meaning: candidate_meanings,
-        created_at: new Date()
-    }, function() {
-        this.save();
-    });
+    */
 }
 
 function transform_longdo_result (raw_html, word) {
