@@ -50,7 +50,13 @@ function pin_searching () {
 // PinManager Class : Handle the group of meaning 
 var PinManager = function(meanings, soundlist) {
     var self = this;
-    this.meanings = meanings;
+    this.meanings = meanings.map(w => {
+        if (w.exact) {
+            return w.desc
+        } else {
+            return `<span style='background-color: rgba(255, 255, 0, 0.5)'>${w.word}</span><br/>${w.desc}`
+        }
+    })
     this.soundlistTpl = '<div style="font-size: 0.7em; margin-bottom: 2px;">';
     for(var i in soundlist){
         var s = soundlist[i];
@@ -70,6 +76,7 @@ var PinManager = function(meanings, soundlist) {
     // show message
     this.show = function(m) {
         pin_up(m, function(box){
+            // init event show more meanings
             $(box).find("#more_meaning").click(self.show_more);
 
             // init trigger for playing voice
@@ -81,7 +88,7 @@ var PinManager = function(meanings, soundlist) {
         });
     }
 
-    // show_more
+    // @click show_more event
     this.show_more = function() {
         var c = "<div>" +
                 self.soundlistTpl + 
@@ -100,7 +107,6 @@ var PinManager = function(meanings, soundlist) {
             "</div>";
     this.show(c);
 }
-
 
 // Main --------------------------------------------------------------
 // init UI
@@ -126,11 +132,9 @@ $(document).dblclick(function (e) {
 
     // call API
     longdo_lookup(word, function(meanings, soundlist){ 
-        // log_word_history(word, meanings, soundlist);
-
-        // sending message to popup
+        // sending message to the popup
         chrome.runtime.sendMessage(
-            null, 
+            null,
             { word: word, meanings: meanings, soundlist: soundlist },
             function(res) {
                 console.log("loging history ok", res);

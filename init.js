@@ -27,7 +27,23 @@ function renderer(meanings, soundlist, word_filter) {
             return false;
         });
     });
+}
 
+function smart_renderer (wordlist, soundlist, word_filter) {
+    if (wordlist.length > 0) {
+        let meanings = wordlist.map(w => {
+            if (w.exact) {
+                return `<li style='background-color: rgba(255, 255, 0, 0.5)'>${w.desc}</li>`
+            } else {
+                return `<li style='background-color: rgba(230, 230, 230, 0.5)'><span style='background-color: rgba(255, 255, 0, 0.5)'>${w.word}</span><br/>${w.desc}</li>`
+            }
+        })
+        $("#content").html("<ul class='meaning-list'>" + meanings.join('<hr/>') + "</ul>");
+    }
+    else $("#content").html(no_meaning_template);
+    
+    // init event for newly-appended a elements
+    init_link_action();
 }
 
 function init_link_action() {
@@ -37,7 +53,7 @@ function init_link_action() {
         $(this).click(function() {
           var w = $(this).text();
           $("#param").val(w);
-          longdo_lookup(w, renderer, render_waiting);
+          longdo_lookup(w, smart_renderer, render_waiting);
         });
     });
 }
@@ -58,7 +74,7 @@ $(document).ready(function  () {
         // sresult = [{ "w": ... , "d": .... , "s": ... , "id": ... }]
         let data = [];
         for(i = 0; i < sresult.length; i++){
-            console.log(sresult[i])
+            // console.log(sresult[i])
             if (sresult[i].w) {
                 data.push("<li class='possible-items'><a href='#'>" + sresult[i].d + '</a></li>');
             }
@@ -74,7 +90,7 @@ $(document).ready(function  () {
         // if user press enter then do seach
         var word = $(this).val();
         if(e.keyCode == 13){
-          longdo_lookup($.trim(word), renderer, render_waiting, null, true);
+          longdo_lookup(word.trim(), smart_renderer, render_waiting, null, true);
         } else if(word.length >= 3){
             // source : http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=rigor
             $.ajax({

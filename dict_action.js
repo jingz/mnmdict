@@ -30,7 +30,8 @@ function log_word_history(word, meanings, soundlist) {
     candidate_meanings = [];
     var i, m;
     for(i = 0; i < meanings.length && i < 3; i++){
-        m = meanings[i]; 
+        // incase voice tag prepared ex <a href='voice.mp3'></a>
+        m = $('<div>' + meanings[i] + '</div>').text().trim(); 
         // expect meaning format like this
         // possible meaning format
         // [N] การทดสอบ, See also: การตรวจสอบ, Syn. trial, tryout
@@ -65,8 +66,72 @@ function log_word_history(word, meanings, soundlist) {
     });
 }
 
+function transform_longdo_result (raw_html, word) {
+    var results = []
+    $("<div>" + raw_html + "</div>").find('table').each(function () {
+        // get title
+        let title = this.previousSibling.innerText.trim();
+        let data = []
+        $(this).find('tr').each(function () {
+          let firstCol = $(this).find('td:eq(0)') // usually be the word
+          let secondCol = $(this).find('td:eq(1)') // usually be description
+           data.push({
+              word: firstCol.html().trim(),
+              desc: secondCol.html().trim(),
+              exact: firstCol.text().trim().toUpperCase() === word.toUpperCase()
+           })
+        })
+
+        results.push({ title, data })
+    })
+
+    // filter sources for enlish
+    // 1. NECTEC Lexitron Dictionary EN-TH
+    // 2. NECTEC Lexitron-2 Dictionary (TH-EN)
+    filter_sources = ['NECTEC Lexitron Dictionary EN-TH', 'NECTEC Lexitron-2 Dictionary (TH-EN)']
+    if (is_english(word)) {
+        result = results.find(r => r.title === 'NECTEC Lexitron Dictionary EN-TH')
+    } else {
+        result = results.find(r => r.title === 'NECTEC Lexitron-2 Dictionary (TH-EN)')
+        if (result) {
+            // clean up desc for thai
+            result.data = result.data.map(r => {
+                r.desc = r.desc.replace(/,?\s?<b>Example:.*/g, '')
+                return r
+            })
+            // merge with eng
+            let en_dict = results.find(r => r.title === 'NECTEC Lexitron Dictionary EN-TH')
+            if (en_dict)
+            result.data = result.data.concat(en_dict.data.map(r => {
+                // swtich word and meaning for th-en
+                return {
+                    word: $("<div>" + r.desc + "</div>").text().split(',')[0],
+                    desc: r.word,
+                    exact: r.exact
+                }
+            }) || [])
+        }
+    }
+
+    if (result) {
+        // clean up desc for NECTEC
+        result.data = result.data.map(r => {
+            r.desc = r.desc.replace(/<b>see also:<\/b>/ig, '')
+            r.desc = r.desc.replace(/<b>syn.<\/b>/ig, '<br/><b>Syn.</b>')
+            r.desc = r.desc.replace(/<b>ant.<\/b>/ig, '<br/><b>Ant.</b>')
+            return r
+        })
+    }
+
+    // { title: ..., data: ...}
+    return result || { data: [] }
+}
+
+function is_english (word) {
+    return word.split('').every(w => w.charCodeAt() <= 122) // 'z'
+}
+
 function longdo_lookup(word, cb, bf, last_char, do_log) {
-    var callee = arguments.callee;
     do_log = do_log || false;
 
     $.ajax({
@@ -76,10 +141,14 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
             cb({},"error");
         },
         success: function  (raw_html) {
-            var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
+            // tranform result
+            var tresult = transform_longdo_result(raw_html, word)
+            // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
+
             var meanings = [];
             var soundlist = []; // { type: 'uk', src: '...' }
-            tb.each(function  () {
+            /*
+            tb.each(function () {
                 // assume TR having img tag is sound button img
                 var el = $(this).find("img");
                 if(el.length > 0 ){
@@ -104,14 +173,16 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     return;
                 }
                 var m = $(this).find("td:eq(1)").html()
+                    // determine that this row is meaning row
                     // should contain 'See also' or 'Syn'
                     if(/see also|syn|ant|example/i.test(m)) 
                         meanings.push(m)
-            });
+            }); */
 
+            /*
             if(meanings.length == 0){
                 // query again without filter
-                tb.each(function  () {
+                tb.each(function () {
                     // skip if has any image tag
                     var el = $(this).find("img");
                     if(el.length > 0 ) return;
@@ -119,13 +190,14 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     meanings.push(m);
                 });
             }
+            */
 
             // check result and wisely search more
-            if(meanings.length > 0) {
+            if(tresult.data.length > 0) {
                 // log history
-                if(do_log) log_word_history(word, meanings, soundlist);
-                // return to callback
-                cb(meanings, soundlist, word);
+                if(do_log) log_word_history(word, tresult.data, soundlist);
+                // return to callback renderer or ballon
+                cb(tresult.data, soundlist, word);
             } else {
                 // if not found do
                 // check if last char is 's' try to search without it
@@ -134,18 +206,15 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     word = word.substring(0, word.length-1);
                     longdo_lookup(word, cb, null, 'e');
                 } else if(/s$/i.test(word)){
-                    word = word.substring(0,word.length-1);
+                    word = word.substring(0, word.length-1);
                     longdo_lookup(word, cb, null, 's')
                 } else if(/ed$/i.test(word)){
-                    word = word.substring(0,word.length-1);
+                    word = word.substring(0, word.length-1);
                     longdo_lookup(word, cb, null, 'd')
                 } else{
-                    cb(["not found"], word);
+                    cb([], [], word);
                 }
-
             }
-            // send array of meaning to callback
-            // cb(meanings ,word)
         }
     });
 }
@@ -154,7 +223,7 @@ chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
     window.log_word_history_from_background(r, sender, sendResponse);
 });
 
-// adding listener for external message
+// adding listener from ballon message
 try {
     chrome.runtime.onMessageExternal.addListener(
         function(req, res, sendResponse) {
@@ -176,6 +245,4 @@ try {
             return true;
         }
     );
-} catch(err) {
-    // do nothing
-}
+} catch(err) { void(0); }
