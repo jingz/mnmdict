@@ -79,10 +79,22 @@ function transform_longdo_result (raw_html, word) {
     // filter sources for enlish
     // 1. NECTEC Lexitron Dictionary EN-TH
     // 2. NECTEC Lexitron-2 Dictionary (TH-EN)
-    // TODO secondary sources
     filter_sources = ['NECTEC Lexitron Dictionary EN-TH', 'NECTEC Lexitron-2 Dictionary (TH-EN)']
+    let secondary_sources = ['Hope Dictionary', 'Nontri Dictionary', 'Longdo Unapproved EN-TH']
+
     if (is_english(word)) {
         result = results.find(r => r.title === 'NECTEC Lexitron Dictionary EN-TH')
+        if (!result) {
+            // try searching in secondary sources
+
+            secondary_results = results.filter(r => secondary_sources.includes(r.title))
+            if (secondary_results.length > 0) {
+                result = { data: [] }
+                secondary_results.forEach(r => {
+                  result.data = result.data.concat(r.data)
+                })
+            }
+        }
     } else {
         result = results.find(r => r.title === 'NECTEC Lexitron-2 Dictionary (TH-EN)')
         if (result) {
@@ -102,7 +114,7 @@ function transform_longdo_result (raw_html, word) {
                     exact: r.exact
                 }
             }) || [])
-        }
+        } 
     }
 
     if (result) {
