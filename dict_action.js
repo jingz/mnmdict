@@ -17,23 +17,25 @@ $.expr[':'].text_match = function (obj, index, meta, stack) {
 }
 
 function log_word_history_from_background(req, sender, sendResponse) {
-    window.log_word_history(req.word, req.meanings, req.soundlist);
+    window.log_word_history(req.word, req.meanings, req.soundlist, req.context, req.from_site);
     sendResponse({ result: "ok"});
 }
 
 // loggin word
-function log_word_history(word, meanings, soundlist) {
+function log_word_history(word, meanings, soundlist, context, from_site) {
     // gether first 3 exactly matched meanings
     candidate_meanings = meanings.filter(m => m.exact)
     // candidate_meanings.splice(0, 3)
     if(candidate_meanings.length === 0) return false;
 
     let log_meanings = candidate_meanings.map(c => $(`<div>${c.desc}</div>`).text().trim() )
-    console.log(log_meanings)
+
     // save looked up word into history
     var w = new Wordlist({
         word: word.toLowerCase(),
         meaning: log_meanings,
+        context,
+        from_site,
         created_at: new Date()
     }, function() {
         this.save();
@@ -197,8 +199,8 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
 
             // check result and wisely search more
             if(tresult.data.length > 0) {
-                // log history
-                if(do_log) log_word_history(word, tresult.data, soundlist);
+                // log history with context and from site is null
+                if(do_log) log_word_history(word, tresult.data, soundlist, null, null);
                 // return to callback renderer or ballon
                 cb(tresult.data, soundlist, word);
             } else {

@@ -26,6 +26,7 @@ function pin_up (m, after_posted) {
         strokeWidth: 1,
         strokeStyle: '#000',
         cssStyles: {
+            position: 'absolute',
             color: '#000',
             zIndex: 9999,
             fontSize: "16px",
@@ -117,6 +118,14 @@ var PinManager = function(meanings, soundlist) {
     this.show(c);
 }
 
+function extract_word_context (select_node) {
+    // expend context level 1
+    // seek first fullstop and halt seeking
+    var front_part = select_node.focusNode.data.slice(0, select_node.focusOffset).split('.')
+    var back_part = select_node.focusNode.data.slice(select_node.focusOffset).split('.')
+    return `${front_part[front_part.length - 1].trim()} ${back_part[0].trim()}.` // context
+}
+
 // Main --------------------------------------------------------------
     // init UI
     $("body").append($( `<div id="bt_dummy"
@@ -144,15 +153,16 @@ var PinManager = function(meanings, soundlist) {
           left: e.pageX
         });
 
+        let context = extract_word_context(sNode)
+        let from_site = sNode.focusNode.baseURI
+
         // call API
         longdo_lookup(word,
             function (meanings, soundlist) { 
                 // sending message to the popup
                 chrome.runtime.sendMessage(null,
-                    { word: word, meanings: meanings, soundlist: soundlist },
+                    { word, meanings, soundlist, context, from_site },
                     function(res) { console.log("loging history ok", res) });
-
-                console.log('show pin up of meaning')
                 new PinManager(meanings, soundlist)
             }, 
             function () {
