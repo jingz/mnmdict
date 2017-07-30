@@ -50,6 +50,11 @@ function pin_searching () {
 // PinManager Class : Handle the group of meaning 
 var PinManager = function(meanings, soundlist) {
     var self = this;
+    if (meanings.length === 0) {
+        pin_up("Sorry, Not Found.")
+        return;
+    }
+
     this.meanings = meanings.map(w => {
         if (w.exact) {
             return w.desc
@@ -105,6 +110,7 @@ var PinManager = function(meanings, soundlist) {
             this.meanings[this.index] + 
             ( this.index < this.n_words-1 ? this.get_more_link() : '' ) +
             "</div>";
+
     this.show(c);
 }
 

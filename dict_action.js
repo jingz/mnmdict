@@ -135,7 +135,6 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
             // tranform result
             var tresult = transform_longdo_result(raw_html, word)
             // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
-
             var meanings = [];
             var soundlist = []; // { type: 'uk', src: '...' }
             /*

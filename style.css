@@ -65,10 +65,6 @@ hr {
     border: 1px;
 }
 
-#no_mean {
-    color: red;
-}
-
 /* auto complete */
 .possible-list {
     padding: 0px;
