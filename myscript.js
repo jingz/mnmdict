@@ -136,8 +136,9 @@ $(document).ready(function () {
         let sNode = window.getSelection()
         let word = (sNode.toString() || '').trim()
 
-        // avoid empty text
+        // avoid empty text and more than 2 words
         if (word === "" ) return false;
+        if (word.split(/\s+/g).length > 2) return false;
 
         window.jqBtDummyContainer.css({
           top: e.pageY - 15,
