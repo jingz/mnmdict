@@ -10,7 +10,7 @@
 // m is message
 // after_posted is function callback called after pined
 function pin_up (m, after_posted) {
-    var balloon = $("#bt_dummy");
+    var balloon = window.jqBtDummyContainer
     // setup balloon
     balloon.bt(m, {
         trigger: 'none',
@@ -36,23 +36,25 @@ function pin_up (m, after_posted) {
           // disable link
           $(box).find("a").css({color: "black"}).click(function() { return false; });
           // callback
-          if(after_posted) after_posted(box);
+          if(typeof after_posted === 'function') after_posted(box);
         }
       });
 
       balloon.btOn();
 }
 
-function pin_searching () {
-    pin_up("<i>Searching...</i>");
-}
-
 // PinManager Class : Handle the group of meaning 
 var PinManager = function(meanings, soundlist) {
     var self = this;
-    if (meanings.length === 0) {
-        pin_up("Sorry, Not Found.")
-        return;
+    // mo meaning or no exactly matched word
+    if (meanings.length === 0 || (meanings.filter(w => w.exact).length === 0)) {
+        // not found notification
+        pin_up(`<div style='text-align: center;'>
+            <font color='red'>Sorry, not found literal meanings.</br>
+            Please search by dict icon on your toolbar for feasible meanings
+            </font>
+            </div>`)
+        return false;
     }
 
     this.meanings = meanings.map(w => {
@@ -62,6 +64,7 @@ var PinManager = function(meanings, soundlist) {
             return `<span style='background-color: rgba(255, 255, 0, 0.5)'>${w.word}</span><br/>${w.desc}`
         }
     })
+
     this.soundlistTpl = '<div style="font-size: 0.7em; margin-bottom: 2px;">';
     for(var i in soundlist){
         var s = soundlist[i];
@@ -73,7 +76,7 @@ var PinManager = function(meanings, soundlist) {
     this.n_words = meanings.length;
 
     // get more link method
-    this.get_more_link = function  () {
+    this.get_more_link = function () {
         var remain = this.n_words - this.index - 1;
         return "<span style='diplay:block; float:right;'><a id='more_meaning' href='#'><b style='color: blue;'>&rarr; ("+remain+")</b></a></span>";
     }
@@ -82,10 +85,10 @@ var PinManager = function(meanings, soundlist) {
     this.show = function(m) {
         pin_up(m, function(box){
             // init event show more meanings
-            $(box).find("#more_meaning").click(self.show_more);
+            $(box).find("#more_meaning").mouseup(self.show_more);
 
             // init trigger for playing voice
-            $(box).find(".soundcheck").click(function () {
+            $(box).find(".soundcheck").mouseup(function () {
                 var href = $(this).attr("href");
                 $("#sound_dummy").attr("src", href);
                 return false;
@@ -94,7 +97,7 @@ var PinManager = function(meanings, soundlist) {
     }
 
     // @click show_more event
-    this.show_more = function() {
+    this.show_more = function () {
         var c = "<div>" +
                 self.soundlistTpl + 
                 self.meanings[++self.index] + 
@@ -115,38 +118,49 @@ var PinManager = function(meanings, soundlist) {
 }
 
 // Main --------------------------------------------------------------
-// init UI
-var dummyUI = '<div id="bt_dummy" style="position: absolute; text-align: left;"></div>';
-$("body").append($(dummyUI));
+$(document).ready(function () {
+    // init UI
+    $("body").append($( `<div id="bt_dummy"
+                              style="position: absolute; text-align: left;"></div>`));
+    // cached
+    window.jqBtDummyContainer = $('#bt_dummy')
 
-// UI for play voice
-var dummySound = '<iframe src="" id="sound_dummy" style="display:none;"></iframe>';
-$("body").append($(dummySound));
+    // UI for play voice
+    var dummySound = '<iframe src="" id="sound_dummy" style="display:none;"></iframe>';
+    $("body").append($(dummySound));
 
-// double click on text
-$(document).dblclick(function (e) {
-    // get seleted word from content
-    var sNode = window.getSelection();
-    var word = $.trim(sNode.toString());
-    // avoid empty text
-    if(word == "" ) return false;
-    var orig = e.originalEvent;
-    $("#bt_dummy").css({
-      top: orig.pageY - 15,
-      left: orig.pageX
-    });
+    // mouseup for trigger searching
+    // work with dbclick and manully text selection
+    document.onmouseup = function (e) {
+        // get seleted word from content
+        let sNode = window.getSelection()
+        let word = (sNode.toString() || '').trim()
 
-    // call API
-    longdo_lookup(word, function(meanings, soundlist){ 
-        // sending message to the popup
-        chrome.runtime.sendMessage(
-            null,
-            { word: word, meanings: meanings, soundlist: soundlist },
-            function(res) {
-                console.log("loging history ok", res);
-            }
-        );
+        // avoid empty text
+        if (word === "" ) return false;
 
-        new PinManager(meanings, soundlist)
-    }, pin_searching);
+        window.jqBtDummyContainer.css({
+          top: e.pageY - 15,
+          left: e.pageX
+        });
+
+        // call API
+        longdo_lookup(word,
+            function (meanings, soundlist) { 
+                // sending message to the popup
+                chrome.runtime.sendMessage(null,
+                    { word: word, meanings: meanings, soundlist: soundlist },
+                    function(res) { console.log("loging history ok", res) });
+
+                console.log('show pin up of meaning')
+                new PinManager(meanings, soundlist)
+            }, 
+            function () {
+                // use timeout to queue this task after mouse click
+                // to avoid closing the ballon before show a mesasge
+                setTimeout(function () {
+                    pin_up(`<i>Searching ...</i>`) 
+                }, 0)
+            });
+    }
 });

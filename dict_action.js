@@ -67,8 +67,8 @@ function transform_longdo_result (raw_html, word) {
           let firstCol = $(this).find('td:eq(0)') // usually be the word
           let secondCol = $(this).find('td:eq(1)') // usually be description
            data.push({
-              word: firstCol.html().trim(),
-              desc: secondCol.html().trim(),
+              word: (firstCol.html() || '').trim(),
+              desc: (secondCol.html() || '').trim(),
               exact: firstCol.text().trim().toUpperCase() === word.toUpperCase()
            })
         })
@@ -79,6 +79,7 @@ function transform_longdo_result (raw_html, word) {
     // filter sources for enlish
     // 1. NECTEC Lexitron Dictionary EN-TH
     // 2. NECTEC Lexitron-2 Dictionary (TH-EN)
+    // TODO secondary sources
     filter_sources = ['NECTEC Lexitron Dictionary EN-TH', 'NECTEC Lexitron-2 Dictionary (TH-EN)']
     if (is_english(word)) {
         result = results.find(r => r.title === 'NECTEC Lexitron Dictionary EN-TH')
