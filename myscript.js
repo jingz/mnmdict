@@ -118,7 +118,6 @@ var PinManager = function(meanings, soundlist) {
 }
 
 // Main --------------------------------------------------------------
-$(document).ready(function () {
     // init UI
     $("body").append($( `<div id="bt_dummy"
                               style="position: absolute; text-align: left;"></div>`));
@@ -164,4 +163,3 @@ $(document).ready(function () {
                 }, 0)
             });
     }
-});
