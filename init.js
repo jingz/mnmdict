@@ -1,34 +1,4 @@
-// Longdo dictionary API
-
-// render
-// passing as callback to longdo_lookup funciton
-function renderer(meanings, soundlist, word_filter) {
-    // hardcode to filter output from longdo html return format
-    // extract only value that match the word filter from the result
-    // render to content
-    if(meanings.length > 0) $("#content").html(meanings.join('<hr/>'));
-    else $("#content").html(no_meaning_template);
-    // inform that the returned meanings result from the nearest word
-    var old_val = $("#param").val();
-    if(old_val != word_filter) $("#param").val(word_filter);//.css({color:"red"})
-            
-    // init event for newly-appended a elements
-    init_link_action();
-
-    for(var i in soundlist){
-        var s = soundlist[i];
-        var el = $("<a class='soundcheck' href='"+s.src+"'>"+s.type.toUpperCase()+" ▸ </a>").appendTo($("#soundlist"));
-    }
-
-    $(".soundcheck").each(function  () {
-        $(this).click(function  () {
-            var href = $(this).attr("href");
-            $("#soundframe").attr("src", href);
-            return false;
-        });
-    });
-}
-
+// render function for searching results in popup
 function smart_renderer (wordlist, soundlist, word_filter) {
     if (wordlist.length > 0) {
         let meanings = wordlist.map(w => {
