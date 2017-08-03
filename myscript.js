@@ -139,7 +139,7 @@ function extract_word_context (select_node) {
 
     // mouseup for trigger searching
     // work with dbclick and manully text selection
-    document.onmouseup = function (e) {
+    document.ondblclick = function (e) {
         // get seleted word from content
         let sNode = window.getSelection()
         let word = (sNode.toString() || '').trim()
