@@ -7,7 +7,7 @@
         "page": "view.html",
         "persistent": false
     },
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "content_security_policy": "script-src 'self' 'unsafe-eval' https://ssl.google-analytics.com; object-src 'self'",
     "content_scripts":[
         {
             "matches": ["*://*/*","file:///*/*"],
@@ -34,6 +34,7 @@
         "*://dict.longdo.com/*",
         "http://search.longdo.com/*",
         "http://ajax.aspnetcdn.com/*",
-        "http://dictionary.cambridge.org/*"
+        "http://dictionary.cambridge.org/*",
+        "https://ssl.google-analytics.com/ga.js"
     ]
 }
