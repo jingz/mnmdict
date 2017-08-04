@@ -1,7 +1,7 @@
 {
     "name": "English <-> Thai Dictionary",
     "manifest_version": 2,
-    "version": "2.4.0",
+    "version": "2.4.1",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
         "page": "view.html",
@@ -17,7 +17,7 @@
                 "config.js",
                 "active_record.js",
                 "wordlist_model.js",
-                "jquery-1.12.4.min.js",
+                "jquery-1.3.2.min.js",
                 "jquery.bt.min.js",
                 "dict_action.js",
                 "active_record.js",
