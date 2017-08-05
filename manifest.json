@@ -1,7 +1,7 @@
 {
     "name": "English <-> Thai Dictionary",
     "manifest_version": 2,
-    "version": "2.4.1",
+    "version": "3.0.0",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
         "page": "view.html",
@@ -35,6 +35,7 @@
         "http://search.longdo.com/*",
         "http://ajax.aspnetcdn.com/*",
         "http://dictionary.cambridge.org/*",
-        "https://ssl.google-analytics.com/ga.js"
+        "https://ssl.google-analytics.com/ga.js",
+        "http://128.199.210.186/"
     ]
 }

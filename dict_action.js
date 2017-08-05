@@ -23,9 +23,7 @@ function log_word_history_from_background(req, sender, sendResponse) {
 
 // loggin word
 function log_word_history(word, meanings, soundlist, context, from_site) {
-    // gether first 3 exactly matched meanings
     candidate_meanings = meanings.filter(m => m.exact)
-    // candidate_meanings.splice(0, 3)
     if(candidate_meanings.length === 0) return false;
 
     let log_meanings = candidate_meanings.map(c => $(`<div>${c.desc}</div>`).text().trim() )
@@ -78,7 +76,7 @@ function transform_longdo_result (raw_html, word) {
         results.push({ title, data })
     })
 
-    // filter sources for enlish
+    // filter sources for english
     // 1. NECTEC Lexitron Dictionary EN-TH
     // 2. NECTEC Lexitron-2 Dictionary (TH-EN)
     filter_sources = ['NECTEC Lexitron Dictionary EN-TH', 'NECTEC Lexitron-2 Dictionary (TH-EN)']
@@ -150,53 +148,7 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
             // tranform result
             var tresult = transform_longdo_result(raw_html, word)
             // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
-            var meanings = [];
             var soundlist = []; // { type: 'uk', src: '...' }
-            /*
-            tb.each(function () {
-                // assume TR having img tag is sound button img
-                var el = $(this).find("img");
-                if(el.length > 0 ){
-                    // finding a contain voice in href
-                    var v = $(this).find("a[href*='voice']");
-                    if(v.length > 0){
-                        var link = v.attr("href");
-                        var matches = /voice=(.*)&/i.exec(link);
-                        // checking duplication type
-                        for(var i in soundlist){
-                            var s = soundlist[i]; 
-                            // voice duplicated
-                            if(s.type == matches[1]) return;
-                        }
-                        // add to list
-                        soundlist.push({
-                            type: matches[1],
-                            src: link
-                        });
-                    }
-                    // extract sound 
-                    return;
-                }
-                var m = $(this).find("td:eq(1)").html()
-                    // determine that this row is meaning row
-                    // should contain 'See also' or 'Syn'
-                    if(/see also|syn|ant|example/i.test(m)) 
-                        meanings.push(m)
-            }); */
-
-            /*
-            if(meanings.length == 0){
-                // query again without filter
-                tb.each(function () {
-                    // skip if has any image tag
-                    var el = $(this).find("img");
-                    if(el.length > 0 ) return;
-                    var m = $(this).find("td:eq(1)").html();
-                    meanings.push(m);
-                });
-            }
-            */
-
             // check result and wisely search more
             if(tresult.data.length > 0) {
                 // log history with context and from site is null

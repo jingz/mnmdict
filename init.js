@@ -44,7 +44,6 @@ $(document).ready(function  () {
         // sresult = [{ "w": ... , "d": .... , "s": ... , "id": ... }]
         let data = [];
         for(i = 0; i < sresult.length; i++){
-            // console.log(sresult[i])
             if (sresult[i].w) {
                 data.push("<li class='possible-items'><a href='#'>" + sresult[i].d + '</a></li>');
             }
@@ -76,6 +75,41 @@ $(document).ready(function  () {
     // set focus to input
     $("#param").focus();
 });
+
+// sync
+var lastSyncId = +window.localStorage.getItem(window.ENV.SYNC_ID_KEY)
+if (typeof lastSyncId !== 'number') {
+    // init  last_sync_id variable
+    window.localStorage.setItem(ENV.SYNC_ID_KEY, 0)
+    lastSyncId = 0
+}
+Wordlist.find_by_sql('select * from wordlist where id > ?;', [lastSyncId] , rec => {
+    if (rec[0]) {
+        $.ajax({
+            url: 'http://128.199.210.186/wordlog/create',
+            data: JSON.stringify({ logs: rec.map(r => {
+                return {
+                    context: r.context,
+                    meaning: r.meaning,
+                    word: r.word,
+                    site_url: r.from_site,
+                    searched_at: new Date(r.created_at)
+                }
+            })}),
+            contentType: 'application/json',
+            type: 'POST',
+            error (eres) {
+                console.error(eres)
+            },
+            success (res) {
+                let lastRec = rec.slice(-1)[0]
+                window.localStorage.setItem(ENV.SYNC_ID_KEY, lastRec.id)
+            }
+        })
+    } else {
+        console.log('nothing to sync', rec)
+    }
+})
 
 // google analytics
 var _gaq = _gaq || [];
