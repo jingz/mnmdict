@@ -1,7 +1,7 @@
 {
     "name": "English <-> Thai Dictionary",
     "manifest_version": 2,
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
         "page": "view.html",
