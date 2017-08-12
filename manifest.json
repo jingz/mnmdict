@@ -36,6 +36,7 @@
         "http://ajax.aspnetcdn.com/*",
         "http://dictionary.cambridge.org/*",
         "https://ssl.google-analytics.com/ga.js",
+        "http://www.ldoceonline.com/",
         "http://128.199.210.186/"
     ]
 }
