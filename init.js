@@ -1,5 +1,5 @@
 // render function for searching results in popup
-function smart_renderer (wordlist, soundlist, word_filter) {
+function smart_renderer (wordlist, soundlist, word_filter, phonetic) {
     if (wordlist.length > 0) {
         let meanings = wordlist.map(w => {
             if (w.exact) {
@@ -11,7 +11,13 @@ function smart_renderer (wordlist, soundlist, word_filter) {
         $("#content").html("<ul class='meaning-list'>" + meanings.join('<hr/>') + "</ul>");
     }
     else $("#content").html(no_meaning_template);
-    
+
+    soundlist.forEach(s => {
+        $('#play_' + s.type).show()
+        $('#sound_' + s.type).attr('src', s.src)  // us , uk
+    })
+
+    $('#phoncodes').html(phonetic)
     // init event for newly-appended a elements
     init_link_action();
 }
@@ -31,7 +37,10 @@ function init_link_action() {
 // beforeSend
 function render_waiting () {
     $("#content").html("Searching ...");
-    $("#soundlist").html("");
+    // $("#soundlist").html("");
+    $('#play_us').hide()
+    $('#play_uk').hide()
+    $("#phoncodes").html("");
 }
 
 // document loaded
@@ -74,9 +83,18 @@ $(document).ready(function  () {
 
     // set focus to input
     $("#param").focus();
+
+    // init play pronounce
+    $('.play_voice').hide()
+    $('.play_voice').click(function () {
+        // audio tag
+        var audio = $(this).next()[0]
+        audio.load()
+        audio.play()
+    })
 });
 
-// sync
+// SYNC wordlist
 var lastSyncId = +window.localStorage.getItem(window.ENV.SYNC_ID_KEY)
 if (typeof lastSyncId !== 'number') {
     // init  last_sync_id variable

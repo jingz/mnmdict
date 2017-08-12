@@ -24,7 +24,17 @@
       <div id="head">
           <div>
             <input title="enter for seaching" placeholder="Lookup word here !" type="text" name="p" value="" id="param">
-            <div id="soundlist"></div>
+            <strong id="phoncodes"></strong>
+            <div id="soundlist">
+                <a id='play_us' href='#' class='play_voice'>US</a>
+                <audio preload='none'>
+                    <source id='sound_us' src='' type="audio/mpeg">
+                </audio>
+                <a id='play_uk' href='#' class='play_voice'>UK</a>
+                <audio preload='none'>
+                    <source id='sound_uk' src='' type="audio/mpeg">
+                </audio>
+            </div>
           </div>
       </div>
       <div id="content">

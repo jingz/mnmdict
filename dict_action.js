@@ -5,6 +5,7 @@ if(window.location.protocol == "chrome-extension:") {
 }
 
 var cambrigde_api = "http://dictionary.cambridge.org/search/british/?utm_source=widget_searchbox_source&utm_medium=widget_searchbox&utm_campaign=widget_tracking";
+var longman_api = 'http://www.ldoceonline.com/dictionary/'
 var no_meaning_template = "<b id='no_mean'>Not found !</b>"
 
 // custom selector
@@ -22,11 +23,17 @@ function log_word_history_from_background(req, sender, sendResponse) {
 }
 
 // loggin word
-function log_word_history(word, meanings, soundlist, context, from_site) {
+function log_word_history(word, meanings, soundlist, context, from_site, phonetic) {
     candidate_meanings = meanings.filter(m => m.exact)
     if(candidate_meanings.length === 0) return false;
 
     let log_meanings = candidate_meanings.map(c => $(`<div>${c.desc}</div>`).text().trim() )
+
+    let sound_us = soundlist.find(s => s.type == 'us') || ''
+    if (sound_us) sound_us = sound_us.src
+
+    let sound_uk = soundlist.find(s => s.type == 'uk') || ''
+    if (sound_uk) sound_uk = sound_uk.src
 
     // save looked up word into history
     var w = new Wordlist({
@@ -34,27 +41,14 @@ function log_word_history(word, meanings, soundlist, context, from_site) {
         meaning: log_meanings,
         context,
         from_site,
+        phonetic,
+        sound_us,
+        sound_uk,
+        is_english: is_english(word),
         created_at: new Date()
     }, function() {
         this.save();
     });
-
-    // voice
-    /*
-    var sound_uk, sound_us;
-    if(soundlist.length > 0){
-        var sound;
-        for(i = 0; i < soundlist.length; i++ ){
-            sound = soundlist[i];
-            if(sound.type == "uk"){
-                sound_uk = sound.src; 
-            } 
-            if(sound.type == "us"){
-                sound_us = sound.src; 
-            } 
-        }
-    }
-    */
 }
 
 function transform_longdo_result (raw_html, word) {
@@ -136,25 +130,72 @@ function is_english (word) {
 }
 
 function longdo_lookup(word, cb, bf, last_char, do_log) {
-    do_log = do_log || false;
+    do_log = do_log || true;
+
+    // search for phonetic and voice
+    let longmanSuccessToken = false
+    let phonetic = ''
+    let ameSrc = ''
+    let breSrc = ''
+    if ( is_english(word) ) {
+        $.ajax({
+          url: longman_api + word,
+          beforeSend () {},
+          error () {
+              longmanSuccessToken = true
+          },
+          success (res) {
+              longmanSuccessToken = true
+              let raw = $('<div>' + res + '</div>')
+              let content = raw.find('.entry_content')
+              let hypen = raw.find('.HYPHENATION')
+              let proncodes = raw.find('.PronCodes:last')
+              let ameVoice = raw.find('span.amefile') // american
+              let breVoice = raw.find('span.brefile') // bretish
+
+              if (proncodes.length > 0) {
+                  phonetic = proncodes.text()
+              }
+
+              if (ameVoice) {
+                  ameSrc = ameVoice.attr('data-src-mp3')
+              }
+
+              if (breVoice) {
+                  breSrc = breVoice.attr('data-src-mp3')
+              }
+          }
+        })
+    } else {
+        longmanSuccessToken = true
+    }
 
     $.ajax({
         url: api + word,
         beforeSend: bf || function(){},
-        error: function  () {
+        error: function () {
             cb({},"error");
         },
         success: function  (raw_html) {
             // tranform result
             var tresult = transform_longdo_result(raw_html, word)
             // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
-            var soundlist = []; // { type: 'uk', src: '...' }
+
             // check result and wisely search more
             if(tresult.data.length > 0) {
                 // log history with context and from site is null
-                if(do_log) log_word_history(word, tresult.data, soundlist, null, null);
                 // return to callback renderer or ballon
-                cb(tresult.data, soundlist, word);
+                let jointTask = setInterval(() => {
+                    if (longmanSuccessToken) {
+                        let soundlist = []; // { type: 'uk', src: '...' }
+                        if (ameSrc) soundlist.push({ type: 'us', src: ameSrc })
+                        if (breSrc) soundlist.push({ type: 'uk', src: breSrc })
+
+                        if(do_log) log_word_history(word, tresult.data, soundlist, null, null, phonetic);
+                        cb(tresult.data, soundlist, word, phonetic);
+                        clearInterval(jointTask)
+                    }
+                }, 50)
             } else {
                 // if not found do
                 // check if last char is 's' try to search without it
@@ -169,12 +210,14 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     word = word.substring(0, word.length-1);
                     longdo_lookup(word, cb, null, 'd')
                 } else{
-                    cb([], [], word);
+                    cb([], [], word, phonetic);
                 }
             }
         }
     });
+
 }
+
 
 chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
     window.log_word_history_from_background(r, sender, sendResponse);

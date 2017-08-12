@@ -1,7 +1,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 18px;
-    width: 350px;
+    width: 500px;
     margin: 0px;
     padding: 0.3rem;
 }
@@ -18,7 +18,7 @@ body {
 
 #soundlist a {
     text-decoration: none;
-    margin-left: 0.1em;
+    margin-left: 0.3rem;
 }
 
 #soundlist a:hover {
@@ -32,7 +32,12 @@ body {
 #param {
     padding: 0.3rem;
     font-size: 1.3rem;
-    width: 80%;
+    width: 200px;
+}
+
+#phoncodes {
+    margin-left: 0.5rem;
+    font-size: 1rem;
 }
 
 #content {
@@ -73,4 +78,8 @@ hr {
 }
 .possible-items {
     margin: 0.3rem;
+}
+
+source {
+    width: 50px;
 }
