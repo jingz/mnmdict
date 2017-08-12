@@ -111,6 +111,10 @@ Wordlist.find_by_sql('select * from wordlist where id > ?;', [lastSyncId] , rec 
                     meaning: r.meaning,
                     word: r.word,
                     site_url: r.from_site,
+                    sound_uk: r.sound_uk,
+                    sound_us: r.sound_us,
+                    is_english: r.is_english,
+                    phonetic: r.phonetic,
                     searched_at: new Date(r.created_at)
                 }
             })}),

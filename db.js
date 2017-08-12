@@ -21,6 +21,8 @@
                     create_table_qry.push("context )");
                     ad.execute(create_table_qry.join(" "), null, function () {
                       context.localStorage.setItem('db_version', '2') 
+                      // reset sync id
+                      context.localStorage.setItem(context.ENV.SYNC_ID_KEY, 0) 
                     });
                 })
             }
