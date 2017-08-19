@@ -18,7 +18,7 @@ $.expr[':'].text_match = function (obj, index, meta, stack) {
 }
 
 function log_word_history_from_background(req, sender, sendResponse) {
-    window.log_word_history(req.word, req.meanings, req.soundlist, req.context, req.from_site);
+    window.log_word_history(req.word, req.meanings, req.soundlist, req.context, req.from_site, req.phonetic);
     sendResponse({ result: "ok"});
 }
 
@@ -130,7 +130,7 @@ function is_english (word) {
 }
 
 function longdo_lookup(word, cb, bf, last_char, do_log) {
-    do_log = do_log || true;
+    do_log = do_log || false;
 
     // search for phonetic and voice
     let longmanSuccessToken = false

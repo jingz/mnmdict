@@ -158,10 +158,10 @@ function extract_word_context (select_node) {
 
         // call API
         longdo_lookup(word,
-            function (meanings, soundlist) { 
+            function (meanings, soundlist, w, phonetic) { 
                 // sending message to the popup
                 chrome.runtime.sendMessage(null,
-                    { word, meanings, soundlist, context, from_site },
+                    { word, meanings, soundlist, context, from_site, phonetic },
                     function(res) { console.log("loging history ok", res) });
                 new PinManager(meanings, soundlist)
             }, 
