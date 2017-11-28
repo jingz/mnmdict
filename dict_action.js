@@ -5,7 +5,8 @@ if(window.location.protocol == "chrome-extension:") {
 }
 
 var cambrigde_api = "http://dictionary.cambridge.org/search/british/?utm_source=widget_searchbox_source&utm_medium=widget_searchbox&utm_campaign=widget_tracking";
-var longman_api = 'http://www.ldoceonline.com/dictionary/'
+var longman_host = 'https://www.ldoceonline.com'
+var longman_api = 'https://www.ldoceonline.com/dictionary/'
 var no_meaning_template = "<b id='no_mean'>Not found !</b>"
 
 // custom selector
@@ -54,12 +55,12 @@ function log_word_history(word, meanings, soundlist, context, from_site, phoneti
 function transform_longdo_result (raw_html, word) {
     var results = []
     $("<div>" + raw_html + "</div>").find('table').each(function () {
-        // get title
+        // get dictionary source title
         let title = this.previousSibling.innerText.trim();
         let data = []
         $(this).find('tr').each(function () {
-          let firstCol = $(this).find('td:eq(0)') // usually be the word
-          let secondCol = $(this).find('td:eq(1)') // usually be description
+          let firstCol = $(this).find('td:eq(0)') // assume to be the word
+          let secondCol = $(this).find('td:eq(1)') // assume to be description
            data.push({
               word: (firstCol.html() || '').trim(),
               desc: (secondCol.html() || '').trim(),
@@ -114,6 +115,7 @@ function transform_longdo_result (raw_html, word) {
     if (result) {
         // clean up desc for NECTEC
         result.data = result.data.map(r => {
+            r.desc = r.desc.replace(/<a\shref.*mp3.*border="0"><\/a>/ig, '')
             r.desc = r.desc.replace(/<b>see also:<\/b>/ig, '')
             r.desc = r.desc.replace(/<b>syn.<\/b>/ig, '<br/><b>Syn.</b>')
             r.desc = r.desc.replace(/<b>ant.<\/b>/ig, '<br/><b>Ant.</b>')
@@ -158,11 +160,11 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
               }
 
               if (ameVoice) {
-                  ameSrc = ameVoice.attr('data-src-mp3')
+                  ameSrc = longman_host + ameVoice.attr('data-src-mp3')
               }
 
               if (breVoice) {
-                  breSrc = breVoice.attr('data-src-mp3')
+                  breSrc = longman_host + breVoice.attr('data-src-mp3')
               }
           }
         })
@@ -184,7 +186,7 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
             // check result and wisely search more
             if(tresult.data.length > 0) {
                 // log history with context and from site is null
-                // return to callback renderer or ballon
+                // return to callback renderer or balloon
                 let jointTask = setInterval(() => {
                     if (longmanSuccessToken) {
                         let soundlist = []; // { type: 'uk', src: '...' }

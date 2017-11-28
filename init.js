@@ -95,12 +95,14 @@ $(document).ready(function  () {
 });
 
 // SYNC wordlist
+/*
 var lastSyncId = +window.localStorage.getItem(window.ENV.SYNC_ID_KEY)
 if (typeof lastSyncId !== 'number') {
     // init  last_sync_id variable
     window.localStorage.setItem(ENV.SYNC_ID_KEY, 0)
     lastSyncId = 0
 }
+
 Wordlist.find_by_sql('select * from wordlist where id > ?;', [lastSyncId] , rec => {
     if (rec[0]) {
         $.ajax({
@@ -132,6 +134,7 @@ Wordlist.find_by_sql('select * from wordlist where id > ?;', [lastSyncId] , rec 
         console.log('nothing to sync', rec)
     }
 })
+*/
 
 // google analytics
 var _gaq = _gaq || [];
