@@ -202,7 +202,7 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     }
                 }, 50)
             } else {
-                // if not found do
+                // if not found do guessing
                 // check if last char is 's' try to search without it
                 // check if last chat is 'ed' do seach again
                 if(last_char && last_char == 'd' && /e$/.test(word)){

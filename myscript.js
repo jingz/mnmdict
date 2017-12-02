@@ -172,4 +172,6 @@ function extract_word_context (select_node) {
                     pin_up(`<i>Searching ...</i>`) 
                 }, 0)
             });
+
+      return false;
     }
