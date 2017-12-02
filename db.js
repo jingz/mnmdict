@@ -1,8 +1,13 @@
 // require lib/adapter.js
 // require config.js
+
+
 (function (context) {
     context.init_db = function() {
         ad = new Adapter(ENV.WEB_DB_CONFIG);
+        // not support logging cause no WebSQL feature
+        if (!ad) return false;
+
         try	{
             if (context.localStorage.getItem('db_version') != '2') {
                 ad.execute('drop table if exists wordlist;', null, function () {
@@ -39,6 +44,5 @@
         } catch (e) {
             console.log(e);
         }
-
     }
 })(window);

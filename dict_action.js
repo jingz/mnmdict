@@ -1,5 +1,7 @@
 if(window.location.protocol == "chrome-extension:") {
     var api = "http://dict.longdo.com/mobile.php?search=";
+} else if (window.location.protocol === 'moz-extension:') {
+    var api = "http://dict.longdo.com/mobile.php?search=";
 } else {
     var api = window.location.protocol + "//dict.longdo.com/mobile.php?search=";
 }
@@ -175,8 +177,9 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
     $.ajax({
         url: api + word,
         beforeSend: bf || function(){},
-        error: function () {
-            cb({},"error");
+        error: function (error) {
+          console.log(error)
+            cb({});
         },
         success: function  (raw_html) {
             // tranform result
