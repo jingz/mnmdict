@@ -30,6 +30,8 @@ function init_link_action() {
           var w = $(this).text();
           $("#param").val(w);
           longdo_lookup(w, smart_renderer, render_waiting);
+
+          return false;
         });
     });
 }
