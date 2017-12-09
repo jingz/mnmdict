@@ -84,7 +84,9 @@ $(document).ready(function  () {
     });
 
     // set focus to input
-    $("#param").focus();
+    setTimeout(() => {
+      document.getElementById('param').focus()
+    }, 150)
 
     // init play pronounce
     $('.play_voice').hide()
