@@ -46,7 +46,7 @@ function render_waiting () {
 }
 
 // document loaded
-$(document).ready(function  () {
+$(document).ready(function() {
     // add handler for input
     window.init_db();
 
@@ -85,16 +85,17 @@ $(document).ready(function  () {
 
     // set focus to input
     setTimeout(() => {
-      document.getElementById('param').focus()
+      var el = document.getElementById('param');
+      if(el) el.focus();
     }, 150)
 
     // init play pronounce
     $('.play_voice').hide()
     $('.play_voice').click(function () {
         // audio tag
-        var audio = $(this).next()[0]
-        audio.load()
-        audio.play()
+        var audio = $(this).next()[0];
+        audio.load();
+        audio.play();
     })
 });
 

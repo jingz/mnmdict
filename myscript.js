@@ -7,12 +7,13 @@
 // }
 
 // pin_up : pin the balloon on above the word
-// m is message
+// content
 // after_posted is function callback called after pined
-function pin_up (m, after_posted) {
+function pin_up (content, after_posted) {
     var balloon = window.jqBtDummyContainer
+
     // setup balloon
-    balloon.bt(m, {
+    balloon.bt(content, {
         trigger: 'none',
         width: 250,
         positions: ['top'],
@@ -33,9 +34,10 @@ function pin_up (m, after_posted) {
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";',
             textAlign: "left"
         },
-        postShow: function(box){
+        postShow: function (box) {
           // disable link
-          $(box).find("a").css({color: "black"}).click(function() { return false; });
+          // but allow sound link to open new window for audio play
+          $(box).find("a:not(.soundcheck)").css({color: "black"}).click(function() { return false; });
           // callback
           if(typeof after_posted === 'function') after_posted(box);
         }
@@ -70,7 +72,7 @@ var PinManager = function(meanings, soundlist) {
     for(var i in soundlist){
         var s = soundlist[i];
         if(typeof s.type == "string")
-            this.soundlistTpl += "<a class='soundcheck' href='"+s.src+"'>"+s.type.toUpperCase()+" ▸ </a>"
+            this.soundlistTpl += "<a target='_blank' class='soundcheck' href='"+s.src+"'>"+s.type.toUpperCase()+" ▸ </a>"
     }
     this.soundlistTpl += '</div>';
     this.index = 0;
@@ -83,23 +85,23 @@ var PinManager = function(meanings, soundlist) {
     }
 
     // show message
-    this.show = function(m) {
-        pin_up(m, function(box){
+    this.show = function (content) {
+        pin_up(content, function (box) {
             // init event show more meanings
             $(box).find("#more_meaning").mouseup(self.show_more);
 
             // init trigger for playing voice
-            $(box).find(".soundcheck").mouseup(function () {
-                var href = $(this).attr("href");
-                $("#sound_dummy").attr("src", href);
-                return false;
-            });
+            // $(box).find(".soundcheck").mouseup(function () {
+            //     var href = $(this).attr("href");
+            //     $("#sound_dummy").attr("src", href);
+            //     return false;
+            // });
         });
     }
 
     // @click show_more event
     this.show_more = function () {
-        var c = "<div>" +
+        let c = "<div>" +
                 self.soundlistTpl + 
                 self.meanings[++self.index] + 
                 ( self.index < self.n_words-1 ? self.get_more_link() : '' ) +
@@ -109,14 +111,15 @@ var PinManager = function(meanings, soundlist) {
     }
 
     // init content in balloon
-    var c = "<div>" +
+    let content = "<div>" +
             this.soundlistTpl + 
             this.meanings[this.index] + 
             ( this.index < this.n_words-1 ? this.get_more_link() : '' ) +
             "</div>";
 
-    this.show(c);
+    this.show(content);
 }
+
 
 function extract_word_context (select_node) {
     // expend context level 1
@@ -126,7 +129,8 @@ function extract_word_context (select_node) {
     return `${front_part[front_part.length - 1].trim()} ${back_part[0].trim()}.` // context
 }
 
-// Main --------------------------------------------------------------
+
+// Main -----------------------------
     // init UI
     $("body").append($( `<div id="bt_dummy"
                               style="position: absolute; text-align: left;"></div>`));
@@ -134,8 +138,8 @@ function extract_word_context (select_node) {
     window.jqBtDummyContainer = $('#bt_dummy')
 
     // UI for play voice
-    var dummySound = '<iframe src="" id="sound_dummy" style="display:none;"></iframe>';
-    $("body").append($(dummySound));
+    // var dummySound = '<iframe src="" allow="autoplay" id="sound_dummy" style="display:none;"></iframe>';
+    // $("body").append($(dummySound));
 
     // mouseup for trigger searching
     // work with dbclick and manully text selection

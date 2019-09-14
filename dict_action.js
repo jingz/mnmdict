@@ -141,14 +141,16 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
     let phonetic = ''
     let ameSrc = ''
     let breSrc = ''
-    if ( is_english(word) ) {
-        $.ajax({
-          url: longman_api + word,
-          beforeSend () {},
-          error () {
-              longmanSuccessToken = true
-          },
-          success (res) {
+    if (is_english(word)) {
+        chrome.runtime.sendMessage(null, {
+          type: 'lookup',
+          ajaxOptions: {
+            url: longman_api + word,
+            contentType: 'text/html',
+            crossDomain: true,
+            withCredentials: true,
+          }
+        }, function (res) {
               longmanSuccessToken = true
               let raw = $('<div>' + res + '</div>')
               let content = raw.find('.entry_content')
@@ -162,65 +164,67 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
               }
 
               if (ameVoice) {
-                  ameSrc = longman_host + ameVoice.attr('data-src-mp3')
+                  ameSrc = ameVoice.attr('data-src-mp3')
               }
 
               if (breVoice) {
-                  breSrc = longman_host + breVoice.attr('data-src-mp3')
+                  breSrc = breVoice.attr('data-src-mp3')
               }
-          }
-        })
+        });
     } else {
         longmanSuccessToken = true
     }
 
-    $.ajax({
+    // call before send action
+    if (bf) bf();
+
+    chrome.runtime.sendMessage(null, {
+      type: 'lookup',
+      ajaxOptions: {
         url: api + word,
-        beforeSend: bf || function(){},
-        error: function (error) {
-          console.log(error)
-            cb({});
-        },
-        success: function  (raw_html) {
-            // tranform result
-            var tresult = transform_longdo_result(raw_html, word)
-            // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
+        crossDomain: true,
+        withCredentials: true,
+        contentType: 'text/html'
+      }
+    }, function (raw_html) {
+        // transform result
+        var tresult = transform_longdo_result(raw_html, word)
+        // var tb = $("<div>"+raw_html+"</div>").find("tr:has(a:text_match('"+word+"'))")
 
-            // check result and wisely search more
-            if(tresult.data.length > 0) {
-                // log history with context and from site is null
-                // return to callback renderer or balloon
-                let jointTask = setInterval(() => {
-                    if (longmanSuccessToken) {
-                        let soundlist = []; // { type: 'uk', src: '...' }
-                        if (ameSrc) soundlist.push({ type: 'us', src: ameSrc })
-                        if (breSrc) soundlist.push({ type: 'uk', src: breSrc })
+        // check result and wisely search more
+        if(tresult.data.length > 0) {
+            // log history with context and from site is null
+            // return to callback renderer or balloon
+            let jointTask = setInterval(() => {
+                if (longmanSuccessToken) {
+                    let soundlist = []; // { type: 'uk', src: '...' }
+                    if (ameSrc) soundlist.push({ type: 'us', src: ameSrc })
+                    if (breSrc) soundlist.push({ type: 'uk', src: breSrc })
 
-                        if(do_log) log_word_history(word, tresult.data, soundlist, null, null, phonetic);
-                        cb(tresult.data, soundlist, word, phonetic);
-                        clearInterval(jointTask)
-                    }
-                }, 50)
-            } else {
-                // if not found do guessing
-                // check if last char is 's' try to search without it
-                // check if last chat is 'ed' do seach again
-                if(last_char && last_char == 'd' && /e$/.test(word)){
-                    word = word.substring(0, word.length-1);
-                    longdo_lookup(word, cb, null, 'e');
-                } else if(/s$/i.test(word)){
-                    word = word.substring(0, word.length-1);
-                    longdo_lookup(word, cb, null, 's')
-                } else if(/ed$/i.test(word)){
-                    word = word.substring(0, word.length-1);
-                    longdo_lookup(word, cb, null, 'd')
-                } else{
-                    cb([], [], word, phonetic);
+                    if(do_log) log_word_history(word, tresult.data, soundlist, null, null, phonetic);
+                    cb(tresult.data, soundlist, word, phonetic);
+                    clearInterval(jointTask)
                 }
+            }, 50)
+        } else {
+            // if not found do guessing
+            // check if last char is 's' try to search without it
+            // check if last chat is 'ed' do seach again
+            if(last_char && last_char == 'd' && /e$/.test(word)){
+                word = word.substring(0, word.length-1);
+                longdo_lookup(word, cb, null, 'e');
+            } else if(/s$/i.test(word)){
+                word = word.substring(0, word.length-1);
+                longdo_lookup(word, cb, null, 's')
+            } else if(/ed$/i.test(word)){
+                word = word.substring(0, word.length-1);
+                longdo_lookup(word, cb, null, 'd')
+            } else{
+                cb([], [], word, phonetic);
             }
         }
-    });
 
+    });
 }
 
 
