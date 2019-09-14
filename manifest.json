@@ -4,7 +4,7 @@
     "version": "4.2.1",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
-        "scripts": ["lib/jquery-2.2.4.min.js", "background.js"],
+        "scripts": ["lib/jquery-3.4.1.min.js", "background.js"],
         "persistent": false
     },
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",

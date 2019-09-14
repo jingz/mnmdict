@@ -1081,7 +1081,7 @@ jQuery.bt = {version: '0.9.7'};
     };
     // if clicked element is a child of neither a tip NOR a target
     // and there are tips in the stack
-    if (!$(e.target).parents().andSelf().filter('.bt-wrapper, .bt-active').length && jQuery.bt.vars.clickAnywhereStack.length) {
+    if (!$(e.target).parents().filter('.bt-wrapper, .bt-active').length && jQuery.bt.vars.clickAnywhereStack.length) {
       // if clicked element isn't inside tip, close tips in stack
       $(jQuery.bt.vars.clickAnywhereStack).btOff();
       $(document).unbind('click', jQuery.bt.docClick);
