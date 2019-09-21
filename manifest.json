@@ -1,13 +1,13 @@
 {
     "name": "English <-> Thai Dictionary",
     "manifest_version": 2,
-    "version": "4.2.1",
+    "version": "4.2.2",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
         "scripts": ["lib/jquery-3.4.1.min.js", "background.js"],
         "persistent": false
     },
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+    "content_security_policy": "script-src 'self'; object-src 'self';",
     "content_scripts":[
         {
             "matches": ["*://*/*","file:///*/*", "http://*/*", "https://*/*"],
@@ -16,12 +16,8 @@
                 "lib/adapter.js",
                 "lib/jquery-3.4.1.min.js",
                 "config.js",
-                "active_record.js",
-                "wordlist_model.js",
                 "jquery.bt.js",
                 "dict_action.js",
-                "active_record.js",
-                "db.js",
                 "myscript.js",
                 "init.js"
             ]

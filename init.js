@@ -64,6 +64,7 @@ $(document).ready(function() {
     }
 
     // autocomplete
+    var searchJSONResultRe = /sresult\s=\s(\[\s+.*\]);$/img
     $("#param").keyup(function  (e) {
         // reset to normal color
         $(this).css({color:"#333"})
@@ -75,9 +76,15 @@ $(document).ready(function() {
             // source : http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=rigor
             $.ajax({
                 url: "http://search.longdo.com/BWTSearch/HeadSearch?json=1&ds=head&num=20&count=7&key=" + word,
-                success: function(res) {
-                    // it will call processJSONSuggest
-                    eval(res);
+                success: function (res) {
+
+                  try {
+                    let sresult = searchJSONResultRe.exec(res);
+                    sresult = JSON.parse(sresult[1]);
+                    processJSONSuggest(sresult);
+                  } catch (e) {
+                    console.log("cannot find search result autocomplete.")
+                  }
                 }
             });
         }

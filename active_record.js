@@ -19,7 +19,7 @@ AR = (function () {
                         return self.attributes." + cols[i] +" = v;        \
                     }); \
                 "
-                eval(str);
+                // eval(str);
             }
             var found;
             for(var k in attrs){
