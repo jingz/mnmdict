@@ -48,7 +48,8 @@ function render_waiting () {
 // document loaded
 $(document).ready(function() {
     // add handler for input
-    window.init_db();
+    // TODO
+    // window.init_db();
 
     // Autocomplete callback
     function processJSONSuggest(sresult, cnt) {

@@ -1,7 +1,7 @@
 {
     "name": "English <-> Thai Dictionary",
     "manifest_version": 2,
-    "version": "4.2.2",
+    "version": "4.2.3",
     "description": "A Minimal English Thai Dictionary Powered by Longdo.",
     "background": {
         "scripts": ["lib/jquery-3.4.1.min.js", "background.js"],
@@ -13,7 +13,6 @@
             "matches": ["*://*/*","file:///*/*", "http://*/*", "https://*/*"],
             "js": [
                 "lib/extend.js",
-                "lib/adapter.js",
                 "lib/jquery-3.4.1.min.js",
                 "config.js",
                 "jquery.bt.js",

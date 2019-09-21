@@ -201,7 +201,8 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
                     if (ameSrc) soundlist.push({ type: 'us', src: ameSrc })
                     if (breSrc) soundlist.push({ type: 'uk', src: breSrc })
 
-                    if(do_log) log_word_history(word, tresult.data, soundlist, null, null, phonetic);
+                    // TODO
+                    // if(do_log) log_word_history(word, tresult.data, soundlist, null, null, phonetic);
                     cb(tresult.data, soundlist, word, phonetic);
                     clearInterval(jointTask)
                 }
@@ -228,30 +229,30 @@ function longdo_lookup(word, cb, bf, last_char, do_log) {
 }
 
 
-chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
-    window.log_word_history_from_background(r, sender, sendResponse);
-});
+// chrome.runtime.onMessage.addListener(function(r, sender, sendResponse) {
+//     window.log_word_history_from_background(r, sender, sendResponse);
+// });
 
 // adding listener from ballon message
-try {
-    chrome.runtime.onMessageExternal.addListener(
-        function(req, res, sendResponse) {
-            // sending array of
-            // { 
-            //   meaning:
-            //   word:
-            // }
-            var data = [];
-            Wordlist.all(function(rs) {
-                for(var i = 0; i < rs.length; i++){
-                    data.push({ meaning: rs[i].meaning, word: rs[i].word});
-                }
-                sendResponse({ result: data });
-            });
-
-            // in order to able to send response
-            // after this listener timeout
-            return true;
-        }
-    );
-} catch(err) { void(0); }
+// try {
+//     chrome.runtime.onMessageExternal.addListener(
+//         function(req, res, sendResponse) {
+//             // sending array of
+//             // { 
+//             //   meaning:
+//             //   word:
+//             // }
+//             var data = [];
+//             Wordlist.all(function(rs) {
+//                 for(var i = 0; i < rs.length; i++){
+//                     data.push({ meaning: rs[i].meaning, word: rs[i].word});
+//                 }
+//                 sendResponse({ result: data });
+//             });
+// 
+//             // in order to able to send response
+//             // after this listener timeout
+//             return true;
+//         }
+//     );
+// } catch(err) { void(0); }
