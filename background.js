@@ -13,13 +13,26 @@
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.type == 'lookup') {
-    let options = msg.ajaxOptions;
+    // let options = msg.ajaxOptions;
+    const {
+        url,
+        contentType,
+        crossDomain,
+        withCredentials
+    } = msg.ajaxOptions
 
-    options.success = function (rawHTML) {
-      sendResponse(rawHTML);
-    }
-
-    $.ajax(options);
+    fetch(url, { 
+        headers: {"Content-Type": contentType }, 
+        credentials: "include" })
+      .then((res) => {
+        if (res.ok) {
+          res.text().then((text) => {
+            sendResponse(text)
+          })
+        } else {
+          throw new Error(res.status, { res })
+        }
+    });
   }
 
   // must be return to prevent

@@ -205,7 +205,7 @@ jQuery.bt = {version: '0.9.7'};
             $(this).prop('title', $(this).prop('bt-xTitle'));
           }
           // then evaluate the selector... title is now in place
-          content = $.isFunction(opts.contentSelector) ? opts.contentSelector.apply(this) : eval(opts.contentSelector);
+          // content = $.isFunction(opts.contentSelector) ? opts.contentSelector.apply(this) : eval(opts.contentSelector);
           if (opts.killTitle) {
             // now remove the title again, so we don't get double tips
             $(this).prop('title', '');
@@ -217,8 +217,8 @@ jQuery.bt = {version: '0.9.7'};
         // ----------------------------------------------
         if (opts.ajaxPath != null && content == false) {
           if (typeof opts.ajaxPath == 'object') {
-            var url = eval(opts.ajaxPath[0]);
-            url += opts.ajaxPath[1] ? ' ' + opts.ajaxPath[1] : '';
+            // var url = eval(opts.ajaxPath[0]);
+            // url += opts.ajaxPath[1] ? ' ' + opts.ajaxPath[1] : '';
           }
           else {
             var url = opts.ajaxPath;

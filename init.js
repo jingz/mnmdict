@@ -1,5 +1,5 @@
 // render function for searching results in popup
-function smart_renderer (wordlist, soundlist=[], word_filter, phonetic) {
+function smart_renderer (wordlist, soundlist=[], word_filter, phonetic, raw_html) {
     if (wordlist.length > 0) {
         let meanings = wordlist.map(w => {
             if (w.exact) {
@@ -10,12 +10,14 @@ function smart_renderer (wordlist, soundlist=[], word_filter, phonetic) {
         })
         $("#content").html("<ul class='meaning-list'>" + meanings.join('<hr/>') + "</ul>");
     }
-    else $("#content").html(no_meaning_template);
+
+    else $("#content").html(raw_html);
 
     soundlist.forEach(s => {
-        $('#play_' + s.type).show()
-        $('#sound_' + s.type).attr('src', s.src)  // us , uk
-    })
+        $('#play_' + s.type).show();
+        $('#play_' + s.type).attr('href', s.src);
+        $('#sound_' + s.type).attr('src', s.src);  // us , uk
+    });
 
     $('#phoncodes').html(phonetic)
     // init event for newly-appended a elements
@@ -30,7 +32,6 @@ function init_link_action() {
           var w = $(this).text();
           $("#param").val(w);
           longdo_lookup(w, smart_renderer, render_waiting);
-
           return false;
         });
     });
@@ -104,7 +105,8 @@ $(document).ready(function() {
         var audio = $(this).next()[0];
         audio.load();
         audio.play();
-    })
+        return false;
+    });
 });
 
 // SYNC wordlist
