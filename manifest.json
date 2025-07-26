@@ -24,17 +24,6 @@
     "default_icon": "dict.png",
     "default_popup": "view.html"
   },
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
-  "host_permissions": [
-    "*://dict.longdo.com/*",
-    "http://search.longdo.com/*",
-    "http://ajax.aspnetcdn.com/*",
-    "http://dictionary.cambridge.org/*",
-    "https://ssl.google-analytics.com/ga.js",
-    "https://www.ldoceonline.com/*",
-    "http://128.199.210.186/"
-  ]
+  "permissions": [],
+  "host_permissions": []
 }
